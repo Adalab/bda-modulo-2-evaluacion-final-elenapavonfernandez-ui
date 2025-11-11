@@ -1,0 +1,132 @@
+USE sakila; 
+
+-- 1. Selecciona todos los nombres de las películas sin que aparezcan duplicados.
+SELECT DISTINCT title AS nombres_peliculas -- Alias más descriptivo
+  FROM film;
+
+-- 2.Muestra los nombres de todas las películas que tengan una clasificación de "PG-13".
+SELECT* -- Comprobar si el dato que necesito está en la tabla
+  FROM film;
+
+-- Query final:
+SELECT title AS "películas_PG-1"  -- Comillas para poder poner el -
+  FROM film 
+  WHERE rating = "PG-13";
+
+-- 3.Encuentra el título y la descripción de todas las películas que contengan la palabra "amazing" en su descripción.
+SELECT title, `description`
+  FROM film 
+  WHERE `description` LIKE "%amazing%";
+  
+-- 4.Encuentra el título de todas las películas que tengan una duración mayor a 120 minutos.
+SELECT title, length -- Query de comprobación 
+  FROM film 
+  WHERE length > 120;
+
+-- Query final: 
+SELECT title AS título_películas
+  FROM film 
+  WHERE length > 120;
+
+-- 5.Recupera los nombres de todos los actores.
+SELECT * 
+  FROM actor;
+
+-- Query final: 
+SELECT first_name AS Nombre, last_name AS Apellido
+  FROM actor;
+
+-- 6.Encuentra el nombre y apellido de los actores que tengan "Gibson" en su apellido.
+SELECT first_name AS Nombre, last_name AS Apellido
+  FROM actor
+  WHERE last_name LIKE "%Gibson%"; -- He usado Like porque el enunciado dice que el apellido TENGA no que SEA. Usando WHERE last_name = "Gibson" obtenemos la misma respuesta.
+
+-- 7.Encuentra los nombres de los actores que tengan un actor_id entre 10 y 20.
+SELECT first_name AS Nombre, actor_id -- comprobación
+  FROM actor
+  WHERE actor_id >= 10 AND actor_id <= 20;
+
+-- Query final: 
+SELECT first_name AS Nombre
+  FROM actor
+  WHERE actor_id >= 10 AND actor_id <= 20;
+-- 8. Encuentra el título de las películas en la tabla film que no sean ni "R" ni "PG-13" en cuanto a su clasificación.
+SELECT title, rating -- comprobar rating
+  FROM film 
+  WHERE rating NOT IN ("R", "PG-13");
+
+-- Query final:
+SELECT title AS Título -- Esta sería la mejor opción porque es la más fácil de leer.
+  FROM film 
+  WHERE rating NOT IN ("R", "PG-13");
+  
+-- Otra opción válida:
+SELECT title AS Título
+ FROM film
+ WHERE rating <> "R" AND rating <> "PG-13";  -- Es AND y no OR porque se tienen que cumplir las DOS condiciones. 
+  
+-- 9.Encuentra la cantidad total de películas en cada clasificación de la tabla film y muestra la clasificación junto con el recuento.
+SELECT *
+  FROM film;
+
+-- Query 1:
+SELECT * 
+  FROM category AS c              -- La información que queremos está en esta tabla 
+  INNER JOIN film_category AS fc  -- Esta es la intermediaria entre Category y Film 
+    ON c.category_id = fc.category_id
+  INNER JOIN film AS f
+    ON f.film_id = fc.film_id;
+
+-- Query 2:
+SELECT c.category_id, c.`name`, f.title -- Limpiamos select con los datos que nos interesan 
+  FROM category AS c              
+  INNER JOIN film_category AS fc  
+    ON c.category_id = fc.category_id
+  INNER JOIN film AS f
+    ON f.film_id = fc.film_id;
+
+-- Query final: 
+SELECT COUNT(c.category_id) AS Recuento, c.`name` AS Clasificación
+  FROM category AS c              
+  INNER JOIN film_category AS fc  
+    ON c.category_id = fc.category_id
+  INNER JOIN film AS f
+    ON f.film_id = fc.film_id
+  GROUP BY c.`name`;
+
+-- 10.Encuentra la cantidad total de películas alquiladas por cada cliente y muestra el ID del cliente, su nombre y apellido junto con la cantidad de películas alquiladas.
+
+SELECT *    -- Ver datos de las dos tablas juntos
+  FROM rental AS r 
+  INNER JOIN customer AS c
+  ON c.customer_id = r.customer_id;
+
+-- Query final: 
+SELECT c.customer_id AS ID_cliente, c.first_name AS Nombre, c.last_name AS Apellido,  COUNT(r.rental_id) AS Películas_Alquiladas
+  FROM rental AS r 
+  INNER JOIN customer AS c
+  ON c.customer_id = r.customer_id
+  GROUP BY c.customer_id, c.first_name, c.last_name;
+
+
+-- 11. Encuentra la cantidad total de películas alquiladas por categoría y muestra el nombre de la categoría junto con el recuento de alquileres.
+
+SELECT *               -- Unimos tablas
+  FROM rental AS r
+  INNER JOIN inventory AS i
+    ON r.inventory_id = i.inventory_id
+  INNER JOIN film AS f
+    ON f.film_id = i.film_id
+  INNER JOIN film_category AS fc
+    ON fc.film_id = f.film_id;
+
+
+SELECT *               
+  FROM rental AS r
+  INNER JOIN inventory AS i
+    ON r.inventory_id = i.inventory_id
+  INNER JOIN film AS f
+    ON f.film_id = i.film_id
+  INNER JOIN film_category AS fc
+    ON fc.film_id = f.film_id
+
