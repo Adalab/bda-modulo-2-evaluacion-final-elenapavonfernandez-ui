@@ -118,10 +118,12 @@ SELECT *               -- Unimos tablas
   INNER JOIN film AS f
     ON f.film_id = i.film_id
   INNER JOIN film_category AS fc
-    ON fc.film_id = f.film_id;
+    ON fc.film_id = f.film_id
+  INNER JOIN category AS c
+    ON c.category_id = fc.category_id;
 
 
-SELECT *               
+SELECT r.rental_id, f.film_id, fc.category_id, c.`name`    -- Limpieza de select y comprobaciones           
   FROM rental AS r
   INNER JOIN inventory AS i
     ON r.inventory_id = i.inventory_id
@@ -129,4 +131,79 @@ SELECT *
     ON f.film_id = i.film_id
   INNER JOIN film_category AS fc
     ON fc.film_id = f.film_id
+    INNER JOIN category AS c
+    ON c.category_id = fc.category_id;
 
+-- Query final:
+
+SELECT c.`name` AS Nombre_categoría, COUNT(f.film_id) AS Recuento_alquileres 
+  FROM rental AS r
+  INNER JOIN inventory AS i
+    ON r.inventory_id = i.inventory_id
+  INNER JOIN film AS f
+    ON f.film_id = i.film_id
+  INNER JOIN film_category AS fc
+    ON fc.film_id = f.film_id
+    INNER JOIN category AS c
+    ON c.category_id = fc.category_id
+GROUP BY c.`name`;
+
+-- 12.Encuentra el promedio de duración de las películas para cada clasificación de la tabla film y muestra la clasificación junto con el promedio de duración.
+SELECT *
+FROM film;
+
+-- Query final:
+
+SELECT rating AS Clasificación, AVG(length) AS Promedio_duración 
+  FROM film
+  GROUP BY rating;
+  
+-- 13.Encuentra el nombre y apellido de los actores que aparecen en la película con title "Indian Love".
+SELECT *
+  FROM actor AS a
+  INNER JOIN film_actor AS fa
+    ON fa.actor_id = a.actor_id
+  INNER JOIN film AS f
+    ON f.film_id = fa.film_id;
+ 
+
+SELECT a.first_name AS Nombre, a.last_name AS Apellido, f.title -- Limpio el select y comprobación de title
+  FROM actor AS a
+  INNER JOIN film_actor AS fa
+    ON fa.actor_id = a.actor_id
+  INNER JOIN film AS f
+    ON f.film_id = fa.film_id
+WHERE f.title = "Indian Love";
+
+-- Query final:
+SELECT a.first_name AS Nombre, a.last_name AS Apellido
+  FROM actor AS a
+  INNER JOIN film_actor AS fa
+    ON fa.actor_id = a.actor_id
+  INNER JOIN film AS f
+    ON f.film_id = fa.film_id
+WHERE f.title = "Indian Love";
+ 
+-- 14.Muestra el título de todas las películas que contengan la palabra "dog" o "cat" en su descripción.
+
+SELECT title, `description`
+  FROM film 
+  WHERE `description` LIKE "%dog%" OR `description` LIKE "%cat%";
+
+-- Query final: 
+SELECT title
+  FROM film 
+  WHERE `description` LIKE "%dog%" OR `description` LIKE "%cat%";
+
+-- 15.Hay algún actor o actriz que no aparezca en ninguna película en la tabla film_actor.
+SELECT *
+  FROM actor AS a
+  INNER JOIN film_actor AS fa
+    ON fa.actor_id = a.actor_id
+  INNER JOIN film AS f
+    ON f.film_id = fa.film_id
+    
+-- 16.Encuentra el título de todas las películas que fueron lanzadas entre el año 2005 y 2010.
+-- 17.Encuentra el título de todas las películas que son de la misma categoría que "Family".
+-- 18.Muestra el nombre y apellido de los actores que aparecen en más de 10 películas.
+-- 19.Encuentra el título de todas las películas que son "R" y tienen una duración mayor a 2 horas en la tabla film.
